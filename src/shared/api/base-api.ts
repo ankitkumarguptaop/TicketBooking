@@ -9,6 +9,6 @@ export const baseApi = createApi({
     // Send the httpOnly session cookie set by the API on every request.
     credentials: "include",
   }),
-  tagTypes: ["User", "SeatMap"],
+  tagTypes: ["User", "SeatMap", "NotificationPreferences", "LoginSession"],
   endpoints: () => ({}),
 });

@@ -50,11 +50,17 @@ export function Header() {
           >
             {unreadNotifications}
           </Link>
-          <Avatar className="size-8">
-            <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
-              {userInitials}
-            </AvatarFallback>
-          </Avatar>
+          <Link
+            href="/profile"
+            aria-label="Your profile"
+            className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <Avatar className="size-8">
+              <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </Container>
     </header>
