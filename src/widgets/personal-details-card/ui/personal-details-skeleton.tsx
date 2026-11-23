@@ -1,6 +1,6 @@
 import { Skeleton } from "@/shared/ui/skeleton";
 
-const fields = ["name", "email", "phone", "city"];
+const fields = ["fullName", "phone", "email"];
 
 export function PersonalDetailsSkeleton() {
   return (

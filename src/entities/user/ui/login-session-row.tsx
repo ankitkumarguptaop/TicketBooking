@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { formatRelativeTime } from "@/shared/lib/format-relative-time";
 
+import { getDeviceLabel } from "../lib/get-device-label";
 import type { LoginSession } from "../model/types";
 
 type Props = {
@@ -17,17 +18,16 @@ export function LoginSessionRow({ session, now, children }: Props) {
     <div className="flex items-center justify-between gap-4 py-3">
       <div className="flex flex-col gap-0.5">
         <p className="text-xs font-semibold">
-          {session.device} · {session.city}
+          {getDeviceLabel(session)}
+          {session.ipAddress && <span className="font-normal text-muted-foreground"> · {session.ipAddress}</span>}
         </p>
-        {session.isCurrent ? (
+        {session.current ? (
           <p className="text-xs text-success">Active now</p>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            Last active {formatRelativeTime(session.lastActiveAt, now)}
-          </p>
+          <p className="text-xs text-muted-foreground">Last active {formatRelativeTime(session.lastUsedAt, now)}</p>
         )}
       </div>
-      {session.isCurrent ? <span className="text-xs text-muted-foreground">This device</span> : children}
+      {session.current ? <span className="text-xs text-muted-foreground">This device</span> : children}
     </div>
   );
 }

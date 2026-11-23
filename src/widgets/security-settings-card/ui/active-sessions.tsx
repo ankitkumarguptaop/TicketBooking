@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginSessionRow, useGetLoginSessionsQuery } from "@/entities/user";
+import { getDeviceLabel, LoginSessionRow, useGetLoginSessionsQuery } from "@/entities/user";
 import { RevokeOtherSessionsButton, RevokeSessionButton } from "@/features/revoke-session";
 import { LoadError } from "@/shared/ui/load-error";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -20,7 +20,7 @@ export function ActiveSessions() {
     return <LoadError message="We couldn’t load your active sessions." onRetry={refetch} />;
   }
 
-  const otherSessionIds = sessions.filter((session) => !session.isCurrent).map((session) => session.id);
+  const otherSessionIds = sessions.filter((session) => !session.current).map((session) => session.id);
 
   return (
     <>
@@ -29,7 +29,7 @@ export function ActiveSessions() {
           <li key={session.id}>
             {/* Every row uses the time the list arrived, not a fresh Date.now(), so renders stay pure. */}
             <LoginSessionRow session={session} now={fulfilledTimeStamp}>
-              <RevokeSessionButton sessionId={session.id} deviceName={session.device} />
+              <RevokeSessionButton sessionId={session.id} deviceName={getDeviceLabel(session)} />
             </LoginSessionRow>
           </li>
         ))}

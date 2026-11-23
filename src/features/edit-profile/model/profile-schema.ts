@@ -1,11 +1,17 @@
 import { z } from "zod";
 
+/** Spaces, dashes and brackets are for reading; the API wants digits only. */
+export function normalisePhone(phone: string): string {
+  return phone.replace(/[\s()-]/g, "");
+}
+
 export const profileSchema = z.object({
-  name: z.string().trim().min(2, "Enter your full name"),
-  email: z.email("Enter a valid email address"),
-  // Spaces are allowed so "+91 98765 43210" reads the way people type it.
-  phone: z.string().trim().regex(/^\+?\d[\d ]{8,16}\d$/, "Enter a valid phone number"),
-  city: z.string().trim().min(2, "Enter your city"),
+  fullName: z.string().trim().min(2, "Enter your full name").max(100, "Use at most 100 characters"),
+  // Typed the way people write it ("+91 98765 43210"), checked the way the API stores it.
+  phone: z
+    .string()
+    .trim()
+    .refine((value) => /^\+?[0-9]{10,15}$/.test(normalisePhone(value)), "Use 10-15 digits, optionally starting with +"),
 });
 
 export type ProfileValues = z.infer<typeof profileSchema>;

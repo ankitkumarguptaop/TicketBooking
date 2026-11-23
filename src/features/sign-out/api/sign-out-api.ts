@@ -2,10 +2,9 @@ import { baseApi } from "@/shared/api/base-api";
 
 const signOutApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    // Dummy implementation. With the real API this becomes POST /auth/logout,
-    // which clears the httpOnly session cookie.
+    // Ends this device's session and clears both httpOnly cookies. Always 204.
     signOut: build.mutation<null, void>({
-      queryFn: async () => ({ data: null }),
+      query: () => ({ url: "/auth/logout", method: "POST" }),
     }),
   }),
 });

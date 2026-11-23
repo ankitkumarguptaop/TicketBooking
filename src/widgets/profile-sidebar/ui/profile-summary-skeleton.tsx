@@ -6,8 +6,7 @@ export function ProfileSummarySkeleton() {
       <Skeleton className="mb-2 size-22 rounded-full" />
       <Skeleton className="h-6 w-36" />
       <Skeleton className="h-4 w-40" />
-      <Skeleton className="h-5 w-24 rounded-full" />
-      <Skeleton className="mt-4 h-10 w-full" />
+      <Skeleton className="h-4 w-28" />
     </div>
   );
 }

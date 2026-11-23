@@ -1,19 +1,29 @@
 export type {
   User,
-  UserProfile,
+  UserRole,
+  SessionStatus,
   NotificationPreferences,
   NotificationPreferenceKey,
   LoginSession,
 } from "./model/types";
-export { sessionSlice, sessionStarted, sessionEnded } from "./model/session-slice";
-export { selectCurrentUser, selectIsAuthenticated } from "./model/selectors";
+export { sessionSlice, sessionStarted, sessionEnded, savedUserLoaded } from "./model/session-slice";
+export { sessionPersistence } from "./model/session-persistence";
 export {
-  useGetProfileQuery,
+  selectCurrentUser,
+  selectSessionStatus,
+  selectIsAuthenticated,
+  selectNeedsVerification,
+} from "./model/selectors";
+export {
+  useGetMeQuery,
   useGetNotificationPreferencesQuery,
   useGetLoginSessionsQuery,
-  profileUpdated,
+  currentUserUpdated,
   notificationPreferenceChanged,
-  loginSessionsRemoved,
-} from "./api/profile-api";
+} from "./api/user-api";
+export { readSavedUser } from "./lib/saved-user";
+export { getDeviceLabel } from "./lib/get-device-label";
+export { hasRequiredVerification } from "./lib/has-required-verification";
 export { UserAvatar } from "./ui/user-avatar";
+export { VerifiedBadge } from "./ui/verified-badge";
 export { LoginSessionRow } from "./ui/login-session-row";

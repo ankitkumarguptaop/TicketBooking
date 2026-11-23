@@ -2,11 +2,16 @@ import Link from "next/link";
 
 import { RegisterForm } from "@/features/auth-by-email";
 import { GoogleSignInButton } from "@/features/auth-by-google";
+import { Stepper } from "@/shared/ui/stepper";
+
+/** Same three steps as the verify step, so sign-up reads as one flow. */
+const steps = ["Account", "Verify email", "Verify phone (optional)"];
 
 export function RegisterPanel() {
   return (
     <section aria-labelledby="register-heading" className="flex flex-col gap-8">
       <header className="flex flex-col gap-2">
+        <Stepper steps={steps} currentStep={0} className="mb-2" />
         <h1 id="register-heading" className="font-heading text-3xl font-bold tracking-tight">
           Create your account
         </h1>

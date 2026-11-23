@@ -1,6 +1,6 @@
 import { configureStore, type ThunkAction, type UnknownAction } from "@reduxjs/toolkit";
 
-import { sessionSlice } from "@/entities/user";
+import { sessionPersistence, sessionSlice } from "@/entities/user";
 import { seatHoldSlice } from "@/features/hold-seats";
 import { selectedSeatsSlice } from "@/features/select-seats";
 import { baseApi } from "@/shared/api/base-api";
@@ -33,7 +33,7 @@ function rootReducer(state: State | undefined, action: UnknownAction): State {
 export function makeStore() {
   return configureStore({
     reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(sessionPersistence.middleware).concat(baseApi.middleware),
   });
 }
 

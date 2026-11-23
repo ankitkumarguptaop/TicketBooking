@@ -1,11 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import { sessionEnded } from "@/entities/user";
 import { baseApi } from "@/shared/api/base-api";
-import { getErrorMessage } from "@/shared/api/get-error-message";
 import { useAppDispatch } from "@/shared/lib/store-hooks";
 import { cn } from "@/shared/lib/utils";
 
@@ -21,11 +19,9 @@ export function SignOutButton({ className }: Props) {
   const [signOut, { isLoading }] = useSignOutMutation();
 
   async function handleClick() {
-    const result = await signOut();
-    if ("error" in result) {
-      toast.error(getErrorMessage(result.error));
-      return;
-    }
+    // Clear local state even if the request fails (e.g. offline): the user asked
+    // to leave, and the server session will expire on its own.
+    await signOut();
     dispatch(sessionEnded());
     // Drop every cached response so the next user never sees this user's data.
     dispatch(baseApi.util.resetApiState());

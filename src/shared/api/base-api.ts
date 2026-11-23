@@ -1,14 +1,10 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { env } from "@/shared/config/env";
+import { baseQueryWithRefresh } from "./base-query-with-refresh";
 
 export const baseApi = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: env.apiUrl,
-    // Send the httpOnly session cookie set by the API on every request.
-    credentials: "include",
-  }),
+  baseQuery: baseQueryWithRefresh,
   tagTypes: ["User", "SeatMap", "NotificationPreferences", "LoginSession"],
   endpoints: () => ({}),
 });

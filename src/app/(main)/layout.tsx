@@ -1,8 +1,16 @@
+import { Suspense } from "react";
+
+import { SessionGuard, SessionRestorer } from "@/features/restore-session";
 import { Header } from "@/widgets/header";
 
 export default function MainLayout({ children }: LayoutProps<"/">) {
   return (
     <>
+      <SessionRestorer />
+      {/* The guard reads the pathname, which is request data on dynamic routes. */}
+      <Suspense fallback={null}>
+        <SessionGuard />
+      </Suspense>
       <Header />
       <main className="flex flex-1 flex-col pb-16">{children}</main>
     </>

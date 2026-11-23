@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { sessionStarted } from "@/entities/user";
-import { getErrorMessage } from "@/shared/api/get-error-message";
-import { useAppDispatch } from "@/shared/lib/store-hooks";
+import { getErrorCode, getErrorMessage } from "@/shared/api/get-error-message";
+import { getSafeReturnPath, registerVerifyPathFor } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/button";
 import { FieldError, FieldGroup } from "@/shared/ui/field";
 import { TextFormField } from "@/shared/ui/text-form-field";
@@ -15,22 +14,28 @@ import { TextFormField } from "@/shared/ui/text-form-field";
 import { useRegisterMutation } from "../api/auth-api";
 import { registerSchema, type RegisterValues } from "../model/register-schema";
 
+const emailTakenCode = "IDENTITY_EMAIL_ALREADY_REGISTERED";
+
 export function RegisterForm() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const [register, { isLoading, error }] = useRegisterMutation();
+  // Shown on the email field itself, so skip the general error below.
+  const emailTaken = getErrorCode(error) === emailTakenCode;
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", phone: "", password: "", confirmPassword: "" },
+    defaultValues: { fullName: "", email: "", phone: "", password: "", confirmPassword: "" },
   });
 
-  async function handleSubmit({ name, email, phone, password }: RegisterValues) {
-    const result = await register({ name, email, phone, password });
+  async function handleSubmit({ fullName, email, phone, password }: RegisterValues) {
+    const result = await register({ fullName, email, phone, password });
     if ("data" in result && result.data) {
-      dispatch(sessionStarted(result.data.user));
-      toast.success("Your account is ready");
-      router.push("/");
+      toast.success("Account created. Now verify your email");
+      // No session: the API set a short-lived verification cookie instead.
+      // Verify, then sign in, then continue to ?next (kept through each step).
+      router.replace(registerVerifyPathFor(getSafeReturnPath(new URLSearchParams(window.location.search).get("next"))));
+    } else if (getErrorCode(result.error) === emailTakenCode) {
+      form.setError("email", { message: "An account with this email already exists" }, { shouldFocus: true });
     }
   }
 
@@ -39,7 +44,7 @@ export function RegisterForm() {
       <FieldGroup className="gap-5">
         <TextFormField
           control={form.control}
-          name="name"
+          name="fullName"
           label="Full name"
           autoComplete="name"
         />
@@ -75,7 +80,7 @@ export function RegisterForm() {
           type="password"
           autoComplete="new-password"
         />
-        {error && <FieldError>{getErrorMessage(error)}</FieldError>}
+        {error && !emailTaken && <FieldError>{getErrorMessage(error)}</FieldError>}
         <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
           {isLoading ? "Creating account…" : "Create account"}
         </Button>

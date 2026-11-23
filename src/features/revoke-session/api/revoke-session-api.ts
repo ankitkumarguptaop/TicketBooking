@@ -1,35 +1,23 @@
-import { loginSessionsRemoved } from "@/entities/user";
 import { baseApi } from "@/shared/api/base-api";
-
-type RevokeResponse = {
-  revokedIds: string[];
-};
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const revokeSessionApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    // Dummy implementations. With the real API these become DELETE /me/sessions/:id
-    // and DELETE /me/sessions (every session except the current one).
-    revokeSession: build.mutation<RevokeResponse, string>({
-      queryFn: async (sessionId) => {
-        await wait(300);
-        return { data: { revokedIds: [sessionId] } };
-      },
-      async onQueryStarted(_sessionId, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
-        dispatch(loginSessionsRemoved(data.revokedIds));
-      },
+    revokeSession: build.mutation<null, string>({
+      query: (sessionId) => ({ url: `/auth/sessions/${encodeURIComponent(sessionId)}`, method: "DELETE" }),
+      invalidatesTags: ["LoginSession"],
     }),
-    revokeOtherSessions: build.mutation<RevokeResponse, string[]>({
-      queryFn: async (otherSessionIds) => {
-        await wait(300);
-        return { data: { revokedIds: otherSessionIds } };
+    // The API's /auth/logout-all also ends THIS device, so instead we revoke
+    // each other session one by one. Tags are invalidated even on failure,
+    // so the list always refetches and shows what really happened.
+    revokeOtherSessions: build.mutation<null, string[]>({
+      async queryFn(otherSessionIds, _api, _extraOptions, baseQuery) {
+        const results = await Promise.all(
+          otherSessionIds.map((id) => baseQuery({ url: `/auth/sessions/${encodeURIComponent(id)}`, method: "DELETE" })),
+        );
+        const failed = results.find((result) => result.error);
+        return failed?.error ? { error: failed.error } : { data: null };
       },
-      async onQueryStarted(_ids, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
-        dispatch(loginSessionsRemoved(data.revokedIds));
-      },
+      invalidatesTags: ["LoginSession"],
     }),
   }),
 });

@@ -1,5 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
+
+import { SessionGuard } from "@/features/restore-session";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
@@ -32,6 +35,10 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
       </aside>
 
       <main className="flex flex-col p-6">
+        {/* Only acts on /verify (the one signed-in page here): sends a signed-out user to /login. */}
+        <Suspense fallback={null}>
+          <SessionGuard />
+        </Suspense>
         <div className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-100">{children}</div>
         </div>

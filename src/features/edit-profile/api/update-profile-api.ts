@@ -1,27 +1,21 @@
-import { profileUpdated, type UserProfile } from "@/entities/user";
+import { currentUserUpdated, type User } from "@/entities/user";
 import { baseApi } from "@/shared/api/base-api";
 
 import type { ProfileValues } from "../model/profile-schema";
 
-type UpdateProfileRequest = {
-  current: UserProfile;
-  values: ProfileValues;
-};
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const updateProfileApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    // Dummy implementation. With the real API this becomes PATCH /me with `values`
-    // as the body, and the response is the updated profile.
-    updateProfile: build.mutation<UserProfile, UpdateProfileRequest>({
-      queryFn: async ({ current, values }) => {
-        await wait(400);
-        return { data: { ...current, ...values } };
-      },
-      async onQueryStarted(_request, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
-        dispatch(profileUpdated(data));
+    // PATCH returns the updated user, so we write it into the getMe cache
+    // instead of refetching. The session slice picks it up from there.
+    updateProfile: build.mutation<User, ProfileValues>({
+      query: (body) => ({ url: "/users/me", method: "PATCH", body }),
+      async onQueryStarted(_values, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(currentUserUpdated(data));
+        } catch {
+          // The form shows the error from the mutation hook.
+        }
       },
     }),
   }),
