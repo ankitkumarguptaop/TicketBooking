@@ -17,7 +17,7 @@ import {
 } from "../api/verify-otp-api";
 import { otpLength, otpSchema, type OtpValues } from "../model/otp-schema";
 import type { VerificationChannel, VerificationScope } from "../model/types";
-import { ResendCodeButton } from "./resend-code-button";
+import { ResendCodeButton } from "@/shared/ui/resend-code-button";
 
 type Props = {
   scope: VerificationScope;

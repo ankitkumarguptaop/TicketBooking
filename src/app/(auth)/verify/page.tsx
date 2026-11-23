@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { VerifyPanel } from "@/widgets/verify-panel";
+import { VerifyPanel, VerifyPanelSkeleton } from "@/widgets/verify-panel";
 
 export const metadata: Metadata = {
   title: "Verify your account",
 };
 
 export default function VerifyPage() {
-  return <VerifyPanel />;
+  return (
+    <Suspense fallback={<VerifyPanelSkeleton />}>
+      <VerifyPanel />
+    </Suspense>
+  );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { io } from "next/cache";
+import { use } from "react";
 import { useGetMeQuery, UserAvatar, VerifiedBadge } from "@/entities/user";
 import { VerifyPhoneDialog } from "@/features/verify-otp";
 import { Badge } from "@/shared/ui/badge";
@@ -8,6 +10,9 @@ import { LoadError } from "@/shared/ui/load-error";
 import { ProfileSummarySkeleton } from "./profile-summary-skeleton";
 
 export function ProfileSummary() {
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   const { data: user, isLoading, isError, refetch } = useGetMeQuery();
 
   if (isLoading) return <ProfileSummarySkeleton />;

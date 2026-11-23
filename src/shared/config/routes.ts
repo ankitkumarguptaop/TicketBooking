@@ -3,7 +3,7 @@
  * (before render) and by the client guard (when a session ends while a page
  * is open). Add a path here to make it public, e.g. "/forgot-password".
  */
-const guestOnlyPaths = ["/login", "/register", "/register/verify"];
+const guestOnlyPaths = ["/login", "/register", "/register/verify", "/forgot-password"];
 
 export function isGuestOnlyPath(pathname: string): boolean {
   return guestOnlyPaths.includes(pathname);

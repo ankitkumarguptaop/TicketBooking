@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
+import { io } from "next/cache";
+import { use, useCallback } from "react";
 
 import { useGetSeatMapQuery } from "@/entities/seat";
 import { useAppDispatch } from "@/shared/lib/store-hooks";
@@ -17,6 +18,9 @@ type Props = {
 };
 
 export function SeatMap({ showId }: Props) {
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   const { data, isLoading, isError, refetch } = useGetSeatMapQuery(showId);
   const dispatch = useAppDispatch();
 

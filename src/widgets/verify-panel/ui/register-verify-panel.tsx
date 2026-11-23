@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { io } from "next/cache";
+import { use, useState } from "react";
 
 import { VerifiedBadge } from "@/entities/user";
 import { useGetRegistrationVerificationStatusQuery, VerifyOtpForm } from "@/features/verify-otp";
@@ -27,6 +28,9 @@ function signInPath(): string {
  * then phone code (optional). Ends with "Sign in".
  */
 export function RegisterVerifyPanel() {
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   const { data: status, isLoading, error, refetch } = useGetRegistrationVerificationStatusQuery();
   // Phone is optional: "Skip for now" just ends the flow here.
   const [phoneSkipped, setPhoneSkipped] = useState(false);

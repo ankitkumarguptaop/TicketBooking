@@ -1,5 +1,7 @@
 "use client";
 
+import { io } from "next/cache";
+import { use } from "react";
 import { useGetNotificationPreferencesQuery, type NotificationPreferenceKey } from "@/entities/user";
 import { NotificationToggle } from "@/features/update-notification-preferences";
 import { LoadError } from "@/shared/ui/load-error";
@@ -17,6 +19,9 @@ const options: { key: NotificationPreferenceKey; label: string; description: str
 ];
 
 export function NotificationSettings() {
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   const { data: preferences, isLoading, isError, refetch } = useGetNotificationPreferencesQuery();
 
   if (isLoading) return <NotificationSettingsSkeleton rows={options.length} />;

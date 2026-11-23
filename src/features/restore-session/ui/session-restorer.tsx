@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { io } from "next/cache";
+import { use, useEffect } from "react";
 
 import { readSavedUser, savedUserLoaded, useGetMeQuery } from "@/entities/user";
 import { useAppDispatch } from "@/shared/lib/store-hooks";
@@ -13,6 +14,9 @@ import { useAppDispatch } from "@/shared/lib/store-hooks";
  */
 export function SessionRestorer() {
   const dispatch = useAppDispatch();
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   useGetMeQuery();
 
   useEffect(() => {

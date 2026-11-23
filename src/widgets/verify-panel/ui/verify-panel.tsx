@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { io } from "next/cache";
+import { use, useEffect } from "react";
 
 import { useGetMeQuery, VerifiedBadge } from "@/entities/user";
 import { SignOutButton } from "@/features/sign-out";
@@ -26,6 +27,9 @@ function returnPath(): string {
  */
 export function VerifyPanel() {
   const router = useRouter();
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   const { data: user, isLoading, isError, refetch } = useGetMeQuery();
   const allVerified = user ? user.emailVerified && user.phoneVerified : false;
 

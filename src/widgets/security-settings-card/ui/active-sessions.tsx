@@ -1,11 +1,16 @@
 "use client";
 
+import { io } from "next/cache";
+import { use } from "react";
 import { getDeviceLabel, LoginSessionRow, useGetLoginSessionsQuery } from "@/entities/user";
 import { RevokeOtherSessionsButton, RevokeSessionButton } from "@/features/revoke-session";
 import { LoadError } from "@/shared/ui/load-error";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 export function ActiveSessions() {
+  // RTK Query reads the clock when the query starts. Keep that out of the
+  // prerendered static shell; the parent's <Suspense> shows the skeleton.
+  use(io());
   const { data: sessions, fulfilledTimeStamp, isLoading, isError, refetch } = useGetLoginSessionsQuery();
 
   if (isLoading) {

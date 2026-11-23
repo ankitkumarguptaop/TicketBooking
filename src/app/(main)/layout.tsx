@@ -6,7 +6,10 @@ import { Header } from "@/widgets/header";
 export default function MainLayout({ children }: LayoutProps<"/">) {
   return (
     <>
-      <SessionRestorer />
+      {/* Renders nothing; Suspense only keeps its query out of the static shell. */}
+      <Suspense fallback={null}>
+        <SessionRestorer />
+      </Suspense>
       {/* The guard reads the pathname, which is request data on dynamic routes. */}
       <Suspense fallback={null}>
         <SessionGuard />
