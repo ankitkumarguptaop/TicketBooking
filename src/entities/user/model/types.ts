@@ -21,6 +21,12 @@ export type User = {
  */
 export type SessionStatus = "unknown" | "authenticated" | "anonymous";
 
+/**
+ * signed-out: the user pressed "Sign out" in this tab.
+ * expired: the API ended it (revoked from another device, refresh failed, ...).
+ */
+export type SessionEndReason = "signed-out" | "expired";
+
 export type NotificationPreferences = {
   bookingUpdates: boolean;
   showReminders: boolean;

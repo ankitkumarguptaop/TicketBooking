@@ -18,11 +18,17 @@ const rawBaseQuery = fetchBaseQuery({
 });
 
 /**
- * 401 codes worth one refresh. INVALID is included on purpose: if the refresh
- * also fails, the API clears both cookies, so the proxy stops treating this
- * browser as signed in (otherwise a bad cookie could bounce between /login and /).
+ * 401 codes worth one refresh. INVALID and SESSION_REVOKED are included on
+ * purpose: the refresh then fails too, and a failed refresh makes the API
+ * clear both cookies, so the proxy stops treating this browser as signed in
+ * (otherwise a dead cookie could bounce between /login and /).
  */
-const refreshableCodes = new Set(["AUTH_TOKEN_EXPIRED", "AUTH_TOKEN_MISSING", "AUTH_TOKEN_INVALID"]);
+const refreshableCodes = new Set([
+  "AUTH_TOKEN_EXPIRED",
+  "AUTH_TOKEN_MISSING",
+  "AUTH_TOKEN_INVALID",
+  "AUTH_SESSION_REVOKED",
+]);
 
 /** A 401 from these is final: refreshing would loop or make no sense. */
 const noRefreshUrls = new Set(["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"]);

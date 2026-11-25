@@ -3,8 +3,8 @@
 import { io } from "next/cache";
 import { use, useEffect } from "react";
 
-import { readSavedUser, savedUserLoaded, useGetMeQuery } from "@/entities/user";
-import { useAppDispatch } from "@/shared/lib/store-hooks";
+import { readSavedUser, savedUserLoaded, selectSessionStatus, useGetMeQuery } from "@/entities/user";
+import { useAppDispatch, useAppSelector } from "@/shared/lib/store-hooks";
 
 /**
  * Restores the session on page load, in two steps:
@@ -17,7 +17,10 @@ export function SessionRestorer() {
   // RTK Query reads the clock when the query starts. Keep that out of the
   // prerendered static shell; the parent's <Suspense> shows the skeleton.
   use(io());
-  useGetMeQuery();
+  const status = useAppSelector(selectSessionStatus);
+  // Once the API said "signed out", stop asking: otherwise clearing the cache
+  // (see SessionGuard) would refetch it and fire a pointless 401 + refresh.
+  useGetMeQuery(undefined, { skip: status === "anonymous" });
 
   useEffect(() => {
     // In an effect, not during render: the server has no localStorage, and

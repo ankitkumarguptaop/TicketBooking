@@ -4,6 +4,10 @@ export const selectCurrentUser = (state: RootState) => state.session.user;
 
 export const selectSessionStatus = (state: RootState) => state.session.status;
 
+/** The API ended the session (e.g. signed out from another device), not this tab. */
+export const selectSessionEndedRemotely = (state: RootState) =>
+  state.session.status === "anonymous" && state.session.endReason === "expired";
+
 export const selectIsAuthenticated = (state: RootState) => state.session.user !== null;
 
 /**

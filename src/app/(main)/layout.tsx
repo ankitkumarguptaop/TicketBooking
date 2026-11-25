@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { SessionGuard, SessionRestorer } from "@/features/restore-session";
+import { SessionEventsListener, SessionGuard, SessionRestorer } from "@/features/restore-session";
 import { Header } from "@/widgets/header";
 
 export default function MainLayout({ children }: LayoutProps<"/">) {
@@ -9,6 +9,10 @@ export default function MainLayout({ children }: LayoutProps<"/">) {
       {/* Renders nothing; Suspense only keeps its query out of the static shell. */}
       <Suspense fallback={null}>
         <SessionRestorer />
+      </Suspense>
+      {/* Live "signed out from another device" events; renders nothing. */}
+      <Suspense fallback={null}>
+        <SessionEventsListener />
       </Suspense>
       {/* The guard reads the pathname, which is request data on dynamic routes. */}
       <Suspense fallback={null}>

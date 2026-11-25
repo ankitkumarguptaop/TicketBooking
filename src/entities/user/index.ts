@@ -2,6 +2,7 @@ export type {
   User,
   UserRole,
   SessionStatus,
+  SessionEndReason,
   NotificationPreferences,
   NotificationPreferenceKey,
   LoginSession,
@@ -13,6 +14,7 @@ export {
   selectSessionStatus,
   selectIsAuthenticated,
   selectNeedsVerification,
+  selectSessionEndedRemotely,
 } from "./model/selectors";
 export {
   useGetMeQuery,
