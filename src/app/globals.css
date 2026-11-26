@@ -59,6 +59,10 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Motion: one UI ease-out for every hover/press, one settle curve for entrances. No overshoot. */
+  --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Balcony palette (from Figma). Components use the semantic tokens below, never these. */

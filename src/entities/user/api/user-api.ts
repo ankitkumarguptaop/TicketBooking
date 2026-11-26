@@ -24,11 +24,8 @@ export const userApi = baseApi.injectEndpoints({
 
 export const { useGetMeQuery, useGetNotificationPreferencesQuery, useGetLoginSessionsQuery } = userApi;
 
-/** Writes a fresh user (e.g. the PATCH response) into the getMe cache, no refetch needed. */
 export const currentUserUpdated = (user: User) => userApi.util.upsertQueryData("getMe", undefined, user);
 
-// The dummy preferences can't be refetched (they'd come back unchanged), so the
-// toggle writes its answer straight into the cache.
 export const notificationPreferenceChanged = (key: NotificationPreferenceKey, enabled: boolean) =>
   userApi.util.updateQueryData("getNotificationPreferences", undefined, (draft) => {
     draft[key] = enabled;

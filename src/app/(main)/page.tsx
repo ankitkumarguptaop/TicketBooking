@@ -12,12 +12,14 @@ export default function HomePage({ searchParams }: PageProps<"/">) {
   return (
     <>
       <HeroBanner />
-      <Container className="flex flex-col gap-8 pt-8">
-        <Suspense fallback={<FilterChipsSkeleton />}>
-          <FilterChips searchParams={searchParams} />
-        </Suspense>
-        <Suspense fallback={<MovieGridSkeleton title={nowShowingTitle} />}>
-          <MovieGrid title={nowShowingTitle} status="now-showing" searchParams={searchParams} />
+      <Container className="flex flex-col gap-16 pt-12 md:gap-20 md:pt-16">
+        <Suspense fallback={<MovieGridSkeleton title={nowShowingTitle} actions={<FilterChipsSkeleton />} />}>
+          <MovieGrid
+            title={nowShowingTitle}
+            status="now-showing"
+            searchParams={searchParams}
+            actions={<FilterChips searchParams={searchParams} />}
+          />
         </Suspense>
         <Suspense fallback={<MovieGridSkeleton title={comingSoonTitle} />}>
           <MovieGrid title={comingSoonTitle} status="coming-soon" searchParams={searchParams} />

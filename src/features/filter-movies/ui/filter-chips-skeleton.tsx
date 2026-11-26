@@ -16,7 +16,7 @@ export function FilterChipsSkeleton() {
   return (
     <div className="flex gap-2 overflow-hidden" aria-hidden>
       {placeholderChips.map((chip) => (
-        <Skeleton key={chip.id} className={`h-8 shrink-0 rounded-full ${chip.width}`} />
+        <Skeleton key={chip.id} className={`h-9 shrink-0 rounded-full ${chip.width}`} />
       ))}
     </div>
   );

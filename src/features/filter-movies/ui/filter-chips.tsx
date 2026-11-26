@@ -23,10 +23,10 @@ export async function FilterChips({ searchParams }: Props) {
                 scroll={false}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "inline-flex h-8 items-center rounded-full border px-4 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "inline-flex h-9 items-center rounded-full border px-4 text-sm font-medium whitespace-nowrap outline-none transition-[background-color,border-color,color,scale] duration-150 ease-soft focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.985] motion-reduce:transition-none",
                   isActive
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-foreground hover:bg-secondary",
+                    : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
                 )}
               >
                 {filter.label}
