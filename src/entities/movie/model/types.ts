@@ -2,26 +2,25 @@ export type MovieStatus = "now-showing" | "coming-soon";
 
 export type PosterTone = "violet" | "teal" | "orange" | "green" | "berry" | "slate";
 
-export type Certificate = "U" | "UA" | "A";
-
-export type Movie = {
+export type MovieSummary = {
   id: string;
   title: string;
-  tagline: string;
-  genre: string;
-  /** First entry is the original language. */
-  languages: string[];
-  certificate: Certificate;
-  rating: number;
-  status: MovieStatus;
+  description: string | null;
+  genres: string[];
+  /** Display name, e.g. "Hindi". */
+  language: string | null;
+  /** Display label, e.g. "UA 13+". */
+  certificate: string | null;
+  durationMinutes: number | null;
+  /** YYYY-MM-DD. */
+  releaseDate: string | null;
+  posterUrl: string | null;
+  /** Gradient used when there is no poster image. */
   posterTone: PosterTone;
-  durationMinutes: number;
-  /** 0 for movies that have not been released yet. */
-  ratingCount: number;
-  description: string;
-  formats: string[];
-  /** ISO date-time strings of upcoming shows. Empty for coming-soon movies. */
-  showtimes: string[];
+  status: MovieStatus;
 };
 
-export type MovieSummary = Omit<Movie, "showtimes">;
+export type Movie = MovieSummary & {
+  /** ISO date-times of upcoming shows. Empty for coming-soon movies. */
+  showtimes: string[];
+};

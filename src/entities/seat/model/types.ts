@@ -5,8 +5,9 @@ export type SeatTier = "recliner" | "premium" | "regular";
 export type SeatStatus = "available" | "held" | "booked";
 
 export type Seat = {
-  /** Row letter + number, e.g. "H6". */
   id: string;
+  /** Row letter + number, e.g. "H6". */
+  label: string;
   row: string;
   number: number;
   tier: SeatTier;
@@ -15,11 +16,14 @@ export type Seat = {
 };
 
 export type SeatRowLayout = {
+  id: string;
   label: string;
-  seats: { id: string; number: number }[];
+  /** `column` is 1-based and shared by every row, so seats line up and empty columns show as aisles. */
+  seats: { id: string; number: number; column: number }[];
 };
 
 export type SeatSectionLayout = {
+  id: string;
   tier: SeatTier;
   label: string;
   price: number;
@@ -28,7 +32,7 @@ export type SeatSectionLayout = {
 
 export type SeatMap = {
   sections: SeatSectionLayout[];
-  /** Seat numbers followed by an aisle, e.g. [4, 12]. */
-  aisleAfter: number[];
+  /** Width of the seat grid in columns, aisles included. */
+  columnCount: number;
   seats: EntityState<Seat, string>;
 };

@@ -16,6 +16,9 @@ function isThisWeekend(date: Date, now: Date) {
   return isWeekendDay && daysAway < 7;
 }
 
+const hasGenre = (movie: Movie, genre: string) =>
+  movie.genres.some((movieGenre) => movieGenre.toLowerCase() === genre);
+
 const hasShow = (movie: Movie, test: (date: Date) => boolean) =>
   movie.showtimes.some((showtime) => test(new Date(showtime)));
 
@@ -23,12 +26,12 @@ export const allFilterId = "all";
 
 export const movieFilters: MovieFilter[] = [
   { id: allFilterId, label: "All", matches: () => true },
-  { id: "hindi", label: "Hindi", matches: (movie) => movie.languages.includes("Hindi") },
-  { id: "english", label: "English", matches: (movie) => movie.languages.includes("English") },
-  { id: "tamil", label: "Tamil", matches: (movie) => movie.languages.includes("Tamil") },
-  { id: "thriller", label: "Thriller", matches: (movie) => movie.genre === "Thriller" },
-  { id: "comedy", label: "Comedy", matches: (movie) => movie.genre === "Comedy" },
-  { id: "sci-fi", label: "Sci-fi", matches: (movie) => movie.genre === "Sci-fi" },
+  { id: "hindi", label: "Hindi", matches: (movie) => movie.language === "Hindi" },
+  { id: "english", label: "English", matches: (movie) => movie.language === "English" },
+  { id: "tamil", label: "Tamil", matches: (movie) => movie.language === "Tamil" },
+  { id: "thriller", label: "Thriller", matches: (movie) => hasGenre(movie, "thriller") },
+  { id: "comedy", label: "Comedy", matches: (movie) => hasGenre(movie, "comedy") },
+  { id: "sci-fi", label: "Sci-fi", matches: (movie) => hasGenre(movie, "sci-fi") },
   {
     id: "today",
     label: "Today",

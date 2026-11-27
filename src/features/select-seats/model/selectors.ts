@@ -45,7 +45,7 @@ export const selectBookingSummary = createSelector(
       .filter((tierSeats) => tierSeats.length > 0)
       .map((tierSeats) => ({
         label: tierLabel[tierSeats[0].tier],
-        seatLabels: tierSeats.map((seat) => seat.id).join(", "),
+        seatLabels: tierSeats.map((seat) => seat.label).join(", "),
         amount: tierSeats.reduce((sum, seat) => sum + seat.price, 0),
       }));
 

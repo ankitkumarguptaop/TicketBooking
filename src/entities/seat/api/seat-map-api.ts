@@ -2,7 +2,8 @@ import { createEntityAdapter } from "@reduxjs/toolkit";
 
 import { baseApi } from "@/shared/api/base-api";
 
-import { buildDummySeatMap, dummyAisleAfter } from "../lib/dummy-seat-map";
+import { buildSeatMap } from "../lib/build-seat-map";
+import type { ScreenLayoutDto, ShowPricingDto } from "../model/seat-map-dto";
 import type { Seat, SeatMap } from "../model/types";
 
 const seatsAdapter = createEntityAdapter<Seat>();
@@ -10,16 +11,18 @@ const seatsAdapter = createEntityAdapter<Seat>();
 const seatMapApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getSeatMap: build.query<SeatMap, string>({
-      // Dummy data for now. With the real API, swap queryFn for a query to /shows/:showId/seats
-      // and a transformResponse that runs seatsAdapter.setAll on the returned seats.
-      queryFn: async (showId) => {
-        const { sections, seats } = buildDummySeatMap(showId);
+      // Two requests: the show gives the screen id and prices, then the screen gives the chairs.
+      queryFn: async (showId, _api, _extraOptions, baseQuery) => {
+        const showResult = await baseQuery(`/shows/${showId}`);
+        if (showResult.error) return { error: showResult.error };
+        const show = showResult.data as ShowPricingDto;
+
+        const layoutResult = await baseQuery(`/screens/${show.screenId}/layout`);
+        if (layoutResult.error) return { error: layoutResult.error };
+
+        const { sections, columnCount, seats } = buildSeatMap(show, layoutResult.data as ScreenLayoutDto);
         return {
-          data: {
-            sections,
-            aisleAfter: dummyAisleAfter,
-            seats: seatsAdapter.setAll(seatsAdapter.getInitialState(), seats),
-          },
+          data: { sections, columnCount, seats: seatsAdapter.setAll(seatsAdapter.getInitialState(), seats) },
         };
       },
       providesTags: (_result, _error, showId) => [{ type: "SeatMap", id: showId }],

@@ -1,8 +1,7 @@
 import { io } from "next/cache";
 
 import type { MovieSummary } from "@/entities/movie";
-import { getShowsForMovie } from "@/entities/show";
-import { getTheatres } from "@/entities/theatre";
+import { getShowsForMovie, type Show } from "@/entities/show";
 import { DateSelector, getSelectedShowDate, getShowDates } from "@/features/select-show-date";
 
 import { ShowtimeSection } from "./showtime-section";
@@ -12,6 +11,15 @@ type Props = {
   movie: MovieSummary;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+/** One list per theatre, theatres in the order their first show appears. */
+function groupByTheatre(shows: Show[]): Show[][] {
+  const byTheatre = new Map<string, Show[]>();
+  for (const show of shows) {
+    byTheatre.set(show.theatreId, [...(byTheatre.get(show.theatreId) ?? []), show]);
+  }
+  return [...byTheatre.values()];
+}
 
 export async function ShowtimeList({ movie, searchParams }: Props) {
   if (movie.status === "coming-soon") {
@@ -28,13 +36,9 @@ export async function ShowtimeList({ movie, searchParams }: Props) {
   const now = new Date();
   const dates = getShowDates(now);
   const selected = getSelectedShowDate(params, dates);
-  const [shows, theatres] = await Promise.all([
-    getShowsForMovie(movie.id, selected.date, now),
-    getTheatres(),
-  ]);
-  const theatresWithShows = theatres
-    .map((theatre) => ({ theatre, shows: shows.filter((show) => show.theatreId === theatre.id) }))
-    .filter((row) => row.shows.length > 0);
+  // The list is cached for a few minutes, so drop shows that started since.
+  const shows = (await getShowsForMovie(movie.id, selected.key)).filter((show) => new Date(show.startsAt) > now);
+  const theatresWithShows = groupByTheatre(shows);
 
   return (
     <ShowtimeSection>
@@ -45,8 +49,8 @@ export async function ShowtimeList({ movie, searchParams }: Props) {
         </p>
       ) : (
         <ul>
-          {theatresWithShows.map(({ theatre, shows: theatreShows }) => (
-            <TheatreShowtimes key={theatre.id} theatre={theatre} shows={theatreShows} />
+          {theatresWithShows.map((theatreShows) => (
+            <TheatreShowtimes key={theatreShows[0].theatreId} shows={theatreShows} />
           ))}
         </ul>
       )}

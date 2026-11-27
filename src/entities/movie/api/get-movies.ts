@@ -1,34 +1,30 @@
-import { dummyMovies, dummyShows, featuredMovieId, type DummyShow } from "../lib/dummy-movies";
-import type { Movie, MovieStatus, MovieSummary } from "../model/types";
+import { cacheLife } from "next/cache";
 
-function toShowtimes(shows: DummyShow[], now: Date): string[] {
-  return shows.map(({ dayOffset, time }) => {
-    const [hours, minutes] = time.split(":").map(Number);
-    const show = new Date(now);
-    show.setDate(show.getDate() + dayOffset);
-    show.setHours(hours, minutes, 0, 0);
-    return show.toISOString();
-  });
-}
+import { maxPageSize, type Page } from "@/shared/api/page";
+import { serverGet } from "@/shared/api/server-get";
+import { toIndiaDateKey } from "@/shared/lib/india-date-key";
+import { isUuid } from "@/shared/lib/is-uuid";
+
+import { toMovie } from "../lib/to-movie";
+import type { MovieDto } from "../model/movie-dto";
+import type { MovieSummary } from "../model/types";
 
 /**
- * Dummy implementation. Shows are generated relative to `now` so the
- * "Today" and "This weekend" filters always have something to match.
+ * First page only (the API caps a page at 100). Add paging here once the
+ * catalogue grows past that.
  */
-export async function getMovies(status: MovieStatus, now: Date): Promise<Movie[]> {
-  return dummyMovies
-    .filter((movie) => movie.status === status)
-    .map((movie) => ({ ...movie, showtimes: toShowtimes(dummyShows[movie.id] ?? [], now) }));
+export async function getMovies(): Promise<MovieSummary[]> {
+  "use cache";
+  cacheLife("minutes");
+  const page = await serverGet<Page<MovieDto>>(`/movies?limit=${maxPageSize}`);
+  const todayKey = toIndiaDateKey(new Date());
+  return (page?.items ?? []).map((dto) => toMovie(dto, todayKey));
 }
 
-export async function getFeaturedMovie(): Promise<MovieSummary> {
-  return dummyMovies.find(({ id }) => id === featuredMovieId) ?? dummyMovies[0];
-}
-
-export async function getMovieById(id: string): Promise<MovieSummary | undefined> {
-  return dummyMovies.find((movie) => movie.id === id);
-}
-
-export async function getMovieIds(): Promise<string[]> {
-  return dummyMovies.map((movie) => movie.id);
+export async function getMovieById(id: string): Promise<MovieSummary | null> {
+  "use cache";
+  cacheLife("minutes");
+  if (!isUuid(id)) return null;
+  const dto = await serverGet<MovieDto>(`/movies/${id}`);
+  return dto ? toMovie(dto, toIndiaDateKey(new Date())) : null;
 }

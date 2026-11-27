@@ -1,7 +1,6 @@
-import { Star } from "lucide-react";
 import Link from "next/link";
 
-import { getFeaturedMovie, MovieMeta, MoviePoster, posterToneClassName } from "@/entities/movie";
+import { getMovies, MovieMeta, MoviePoster, posterToneClassName } from "@/entities/movie";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Container } from "@/shared/ui/container";
@@ -12,7 +11,9 @@ const enter =
   "animate-in fade-in slide-in-from-bottom-3 fill-mode-both duration-700 ease-enter motion-reduce:animate-none";
 
 export async function HeroBanner() {
-  const movie = await getFeaturedMovie();
+  // The API has no "featured" flag yet, so the hero shows the first movie that is out.
+  const movie = (await getMovies()).find(({ status }) => status === "now-showing");
+  if (!movie) return null;
 
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden border-b border-border">
@@ -40,17 +41,13 @@ export async function HeroBanner() {
             {movie.title}
           </h1>
           <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-1 text-sm", enter, "delay-200")}>
-            <span className="inline-flex items-center gap-1 font-semibold text-primary">
-              <Star aria-hidden className="size-3.5 fill-current" />
-              <span className="sr-only">Rated </span>
-              {movie.rating.toFixed(1)}
-              <span className="sr-only"> out of 5</span>
-            </span>
             <MovieMeta movie={movie} showDuration />
           </div>
-          <p className={cn("max-w-lg text-base text-foreground/85 md:text-lg", enter, "delay-300")}>
-            {movie.tagline}
-          </p>
+          {movie.description && (
+            <p className={cn("line-clamp-3 max-w-lg text-base text-foreground/85 md:text-lg", enter, "delay-300")}>
+              {movie.description}
+            </p>
+          )}
           <div className={cn("mt-2 flex flex-wrap gap-3", enter, "delay-400")}>
             <Button asChild size="lg" className="px-6">
               <Link href={`/movies/${movie.id}`}>Book tickets</Link>
@@ -61,7 +58,15 @@ export async function HeroBanner() {
           </div>
         </div>
         <div className={cn("hidden w-full max-w-sm justify-self-end md:col-span-5 md:col-start-8 md:block lg:col-span-4 lg:col-start-9", enter, "delay-300 duration-1000")}>
-          <MoviePoster title={movie.title} tone={movie.posterTone} size="lg" className="shadow-2xl shadow-black/40" />
+          <MoviePoster
+            title={movie.title}
+            posterUrl={movie.posterUrl}
+            tone={movie.posterTone}
+            sizes="24rem"
+            size="lg"
+            preload
+            className="shadow-2xl shadow-black/40"
+          />
         </div>
       </Container>
     </section>

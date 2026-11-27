@@ -28,7 +28,7 @@ export const Seat = memo(function Seat({ showId, seatId, number, onToggle }: Pro
       type="button"
       disabled={!isPickable}
       aria-pressed={isSelected}
-      aria-label={`Seat ${seatId}, Rs ${seat?.price ?? ""}, ${seatStateLabel[visualState]}`}
+      aria-label={`Seat ${seat?.label ?? number}, Rs ${seat?.price ?? ""}, ${seatStateLabel[visualState]}`}
       onClick={() => onToggle(seatId)}
       className={cn(
         "flex size-7 items-center justify-center rounded-md border text-[0.625rem] font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed",

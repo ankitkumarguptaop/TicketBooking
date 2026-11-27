@@ -45,16 +45,25 @@ export function SeatMap({ showId }: Props) {
     );
   }
 
+  if (data.sections.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-8">
+        <p className="text-sm font-semibold">Seats for this show aren’t open yet.</p>
+        <p className="text-sm text-muted-foreground">Please pick another show.</p>
+      </div>
+    );
+  }
+
   return (
     <section aria-label="Seat map" className="flex min-w-0 flex-col gap-8">
       <div className="overflow-x-auto pb-2">
         <div className="mx-auto flex w-max flex-col gap-6">
           {data.sections.map((section) => (
             <SeatSection
-              key={section.tier}
+              key={section.id}
               showId={showId}
               section={section}
-              aisleAfter={data.aisleAfter}
+              columnCount={data.columnCount}
               onToggle={handleToggle}
             />
           ))}

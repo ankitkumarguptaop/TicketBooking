@@ -2,7 +2,8 @@ import { io } from "next/cache";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { getMovies, MovieCard, type MovieStatus } from "@/entities/movie";
+import { getMovies, MovieCard, type Movie, type MovieStatus } from "@/entities/movie";
+import { getUpcomingShows, type Show } from "@/entities/show";
 import { getActiveFilter } from "@/features/filter-movies";
 
 import { MovieGridLayout } from "./movie-grid-layout";
@@ -14,13 +15,27 @@ type Props = {
   actions?: ReactNode;
 };
 
+/** The "Today" and "This weekend" filters need each movie's upcoming showtimes. */
+function groupShowtimesByMovie(shows: Show[]) {
+  const byMovie = new Map<string, string[]>();
+  for (const show of shows) {
+    byMovie.set(show.movieId, [...(byMovie.get(show.movieId) ?? []), show.startsAt]);
+  }
+  return byMovie;
+}
+
 export async function MovieGrid({ title, status, searchParams, actions }: Props) {
   const filter = getActiveFilter(await searchParams);
   // io() keeps the clock read out of the prerendered shell, so "today" means
   // the visitor's request time, not the build time.
   await io();
   const now = new Date();
-  const movies = (await getMovies(status, now)).filter((movie) => filter.matches(movie, now));
+  const [allMovies, shows] = await Promise.all([getMovies(), getUpcomingShows()]);
+  const showtimes = groupShowtimesByMovie(shows);
+  const movies: Movie[] = allMovies
+    .filter((movie) => movie.status === status)
+    .map((movie) => ({ ...movie, showtimes: showtimes.get(movie.id) ?? [] }))
+    .filter((movie) => filter.matches(movie, now));
   const count = `${movies.length} ${movies.length === 1 ? "film" : "films"}`;
 
   return (

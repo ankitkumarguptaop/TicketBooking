@@ -1,4 +1,3 @@
-import { demoContestedSeatId } from "@/entities/seat";
 import { baseApi } from "@/shared/api/base-api";
 
 type HoldRequest = {
@@ -22,9 +21,6 @@ export const holdApi = baseApi.injectEndpoints({
     holdSeat: build.mutation<HoldResponse, HoldRequest>({
       queryFn: async ({ seatId }) => {
         await wait(250);
-        if (seatId === demoContestedSeatId) {
-          return { error: { status: 409, data: { message: `Seat ${seatId} was just taken by another user` } } };
-        }
         return { data: { seatId, heldUntil: Date.now() + holdDurationMs } };
       },
     }),

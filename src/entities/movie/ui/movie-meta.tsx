@@ -4,15 +4,17 @@ import { formatDuration } from "../lib/format-duration";
 import type { MovieSummary } from "../model/types";
 
 type Props = {
-  movie: Pick<MovieSummary, "genre" | "languages" | "certificate" | "durationMinutes">;
+  movie: Pick<MovieSummary, "genres" | "language" | "certificate" | "durationMinutes">;
   showDuration?: boolean;
   className?: string;
 };
 
-/** "Thriller · Hindi · UA · 2h 22m": one muted line, props only. */
+/** "Thriller · Hindi · UA 13+ · 2h 22m": one muted line, props only. Missing values are skipped. */
 export function MovieMeta({ movie, showDuration = false, className }: Props) {
-  const parts = [movie.genre, movie.languages[0], movie.certificate];
-  if (showDuration) parts.push(formatDuration(movie.durationMinutes));
+  const duration = showDuration && movie.durationMinutes ? formatDuration(movie.durationMinutes) : null;
+  const parts = [movie.genres[0], movie.language, movie.certificate, duration].filter(
+    (part): part is string => Boolean(part),
+  );
 
   return (
     <p className={cn("flex flex-wrap items-center gap-x-1.5 text-muted-foreground", className)}>

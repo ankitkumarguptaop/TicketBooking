@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import Link from "next/link";
 
 import type { MovieSummary } from "../model/types";
@@ -10,8 +9,6 @@ type Props = {
 };
 
 export function MovieCard({ movie }: Props) {
-  const isComingSoon = movie.status === "coming-soon";
-
   return (
     <Link
       href={`/movies/${movie.id}`}
@@ -19,22 +16,14 @@ export function MovieCard({ movie }: Props) {
     >
       <MoviePoster
         title={movie.title}
+        posterUrl={movie.posterUrl}
         tone={movie.posterTone}
-        label={isComingSoon ? "Coming soon" : undefined}
+        sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
+        label={movie.status === "coming-soon" ? "Coming soon" : undefined}
         className="transition-[translate,border-color] duration-150 ease-soft group-hover:-translate-y-0.5 group-hover:border-foreground/25 motion-reduce:transition-none"
       />
       <div className="flex flex-col gap-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="truncate text-sm font-semibold">{movie.title}</h3>
-          {!isComingSoon && (
-            <p className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
-              <Star aria-hidden className="size-3 fill-current" />
-              <span className="sr-only">Rated </span>
-              {movie.rating.toFixed(1)}
-              <span className="sr-only"> out of 5</span>
-            </p>
-          )}
-        </div>
+        <h3 className="truncate text-sm font-semibold">{movie.title}</h3>
         <MovieMeta movie={movie} className="text-xs" />
       </div>
     </Link>
